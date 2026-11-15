@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basic IFR Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Palette: paper, ink, one signal orange. Layout: fixed left rail of lessons, single reading column, quiz closes each lesson. */
+:root{
+  --bg:#f6f6f3; --surface:#ffffff; --ink:#0e1318; --mute:#66707c; --line:#dfe1e4; --accent:#e8480c;
+  --ok:#17784a; --bad:#c2312a; --tint:#eef0f2;
+  --display:'IBM Plex Sans',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0c1117;--surface:#121a23;--ink:#e9edf1;--mute:#8a95a2;--line:#233040;--accent:#ff7038;--ok:#4cc88a;--bad:#ff7a70;--tint:#17212c;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0c1117;--surface:#121a23;--ink:#e9edf1;--mute:#8a95a2;--line:#233040;--accent:#ff7038;--ok:#4cc88a;--bad:#ff7a70;--tint:#17212c;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:288px 1fr;min-height:100vh}
+.rail{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);padding:28px 20px;display:flex;flex-direction:column;gap:28px;background:var(--bg)}
+.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none;cursor:pointer;background:none;border:0;text-align:left;padding:0}
+.brand b{font-weight:600;letter-spacing:.02em;font-size:15px}
+.brand span{font-family:var(--mono);font-size:11.5px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:grid;grid-template-columns:30px 1fr auto;align-items:baseline;gap:6px;text-align:left;background:none;border:0;border-left:2px solid transparent;padding:9px 10px;cursor:pointer;border-radius:0 6px 6px 0;color:var(--mute)}
+.nav button:hover{background:var(--tint);color:var(--ink)}
+.nav button[aria-current="page"]{border-left-color:var(--accent);color:var(--ink);background:var(--tint)}
+.nav .n{font-family:var(--mono);font-size:12px}
+.nav .t{font-size:14.5px;line-height:1.3}
+.nav .s{font-family:var(--mono);font-size:11.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.nav .s.done{color:var(--ok)}
+.rail small{margin-top:auto;color:var(--mute);font-size:12px;line-height:1.5}
+.top{display:none}
+
+main{padding:56px clamp(20px,5vw,72px) 96px;min-width:0}
+.col{max-width:720px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 14px}
+h1{font-weight:300;font-size:clamp(34px,5vw,52px);line-height:1.08;letter-spacing:-.02em;margin:0 0 14px;text-wrap:balance}
+.lede{font-size:18px;color:var(--mute);margin:0 0 40px;max-width:58ch;text-wrap:pretty}
+h2{font-weight:500;font-size:22px;letter-spacing:-.01em;margin:0 0 14px;display:flex;gap:12px;align-items:baseline;text-wrap:balance}
+h2 .cn{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;min-width:24px}
+h3{font-size:12.5px;font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;font-weight:500;color:var(--mute);margin:22px 0 8px}
+.chap{padding:34px 0;border-top:1px solid var(--line)}
+.chap p{margin:0 0 12px;max-width:66ch;text-wrap:pretty}
+.chap ul,.chap ol{margin:0 0 12px;padding-left:20px;max-width:66ch}
+.chap li{margin:3px 0}
+.chap li::marker{color:var(--mute)}
+code,.mono{font-family:var(--mono);font-size:.9em}
+code{background:var(--tint);padding:1px 6px;border-radius:4px}
+
+.call{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:baseline;border-left:2px solid var(--line);padding:6px 0 6px 14px;margin:8px 0;max-width:66ch}
+.call.you{border-left-color:var(--accent)}
+.call span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--mute)}
+.call.you span{color:var(--accent)}
+.call p{margin:0!important;font-family:var(--mono);font-size:14px;line-height:1.55}
+.note{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:14.5px;max-width:66ch}
+.note b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-right:8px;font-weight:500}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:66ch}
+.cols ul,.cols ol{padding-left:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:12px 0}
+.grid div{background:var(--surface);padding:9px 12px;font-size:14px}
+.grid b{font-family:var(--mono);font-weight:500;margin-right:6px;color:var(--accent)}
+.grid i{display:block;font-style:normal;font-size:12px;color:var(--mute);font-family:var(--mono)}
+.dl{display:grid;grid-template-columns:minmax(130px,auto) 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:12px 0;background:var(--surface)}
+.dl dt,.dl dd{margin:0;padding:8px 14px;border-top:1px solid var(--line);font-size:14.5px}
+.dl dt:first-of-type,.dl dd:first-of-type{border-top:0}
+.dl dt{font-family:var(--mono);font-size:13px;font-weight:500}
+.dl dd{color:var(--mute)}
+.tw{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 14px;border-top:1px solid var(--line);vertical-align:top}
+tr:first-child th,tr:first-child td{border-top:0}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);font-weight:500;white-space:nowrap}
+td.m{font-family:var(--mono);font-size:13px;white-space:nowrap}
+pre{font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:12px 0}
+.bad{color:var(--bad)} .good{color:var(--ok)}
+
+/* quiz */
+.quiz{margin-top:24px;border-top:1px solid var(--ink);padding-top:34px}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:28px;max-width:720px}
+.ticks{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;margin:0 0 22px}
+.ticks i{height:4px;border-radius:2px;background:var(--line)}
+.ticks i.ok{background:var(--ok)} .ticks i.no{background:var(--bad)} .ticks i.cur{background:var(--ink)}
+.qmeta{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--mute);display:flex;justify-content:space-between;margin-bottom:10px;text-transform:uppercase}
+.qtext{font-size:20px;line-height:1.4;margin:0 0 20px;font-weight:400;text-wrap:balance}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:26px 1fr;gap:10px;text-align:left;background:none;border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;line-height:1.4}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .k{font-family:var(--mono);font-size:12px;color:var(--mute);padding-top:2px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.opt:disabled{cursor:default}
+.exp{margin:18px 0 0;font-size:14.5px;color:var(--mute);border-top:1px solid var(--line);padding-top:14px}
+.exp b{color:var(--ink);font-weight:500}
+.btn{display:inline-block;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:11px 20px;cursor:pointer;font-weight:500;font-size:15px}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn:hover{opacity:.88}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center}
+.score{font-weight:300;font-size:64px;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;margin:6px 0 4px}
+.score span{font-size:24px;color:var(--mute)}
+.miss{margin:20px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.miss li{border-left:2px solid var(--bad);padding-left:12px;font-size:14.5px}
+.miss em{display:block;color:var(--mute);font-style:normal;margin-top:2px}
+
+/* home */
+.hero svg{width:100%;height:auto;display:block;margin:0 0 36px;color:var(--ink)}
+.tbl{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.tbl button{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:baseline;background:none;border:0;border-bottom:1px solid var(--line);padding:16px 4px;text-align:left;cursor:pointer}
+.tbl button:hover{background:var(--tint)}
+.tbl .n{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.tbl .t{font-size:18px}
+.tbl .t small{display:block;font-size:14px;color:var(--mute);margin-top:2px}
+.tbl .s{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.tbl .s.done{color:var(--ok)}
+.fine{font-size:13px;color:var(--mute);margin-top:32px;max-width:62ch}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .rail{position:fixed;inset:0 auto 0 0;width:min(300px,86vw);z-index:5;transform:translateX(-100%);transition:transform .2s;background:var(--bg)}
+  .rail.open{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
+  .top{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:4}
+  .top button{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer;font-family:var(--mono);font-size:12px}
+  .top b{font-weight:500;font-size:14px}
+  main{padding-top:32px}
+  .cols{grid-template-columns:1fr}
+  .qcard{padding:20px}
+  .call{grid-template-columns:36px 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top"><button id="menu" aria-label="Open lessons" aria-expanded="false">Lessons</button><b>Basic IFR Course</b></div>
+<div class="app">
+  <aside class="rail" id="rail">
+    <button class="brand" id="home"><b>Basic IFR Course</b><span>ATC24 · PTFS</span></button>
+    <nav class="nav" id="nav" aria-label="Lessons"></nav>
+    <small>Study aid based on the ATC24 Basic IFR Guide v1.1 by Landguy18. For ATC24 only, never real-world procedures.</small>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const A = t => `<div class="call atc"><span>ATC</span><p>${t}</p></div>`;
+const P = t => `<div class="call you"><span>YOU</span><p>${t}</p></div>`;
+const NOTE = (t,l) => `<div class="note"><b>${l||'Note'}</b>${t}</div>`;
+const DL = rows => `<dl class="dl">${rows.map(r=>`<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>`;
+const TBL = (head,rows) => `<div class="tw"><table><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===0?' class="m"':''}>${c}</td>`).join('')}</tr>`).join('')}</table></div>`;
+const Q = (q,c,w1,w2,w3,e) => ({q,o:[c,w1,w2,w3],e});
+
+/* ---------- lessons ---------- */
+const LESSONS = [
+
+/* ===== 1 ===== */
+{ id:'introduction', title:'Introduction', focus:'Personal self. What ATC24 is, what you need, and how to start without fear.',
+chapters:[
+ {t:'What is ATC24?', h:`
+  <p>ATC24 is the official ATC roleplay server of Pilot Training Flight Simulator (PTFS) on Roblox. Controllers cover airports whenever possible, and everyone follows basic procedures and phraseology based on the standard of the International Civil Aviation Organization (ICAO).</p>
+  <p>Habits from public PTFS servers are discouraged here. ATC24 is built for beginners, so many real procedures are simplified or left out. Expect a reasonable level of realism, with the core concepts of aviation, running 24/7.</p>
+  ${NOTE('The guide is for ATC24 only. Do not use it for other virtual aviation networks or for real-world procedures.','Scope')}`},
+ {t:'Requirements', h:`
+  <ol>
+   <li>The ATC24 role</li><li>A working microphone (any device)</li><li>A notepad or notes app</li><li>Reading the rules</li>
+   <li>Knowing your aircraft and its limits</li><li>Personal study time</li><li>Basic English, enough to be understood</li>
+   <li>Patience</li><li>Your full attention</li><li>Infinite Fuel switched on in PTFS settings</li><li>Respect</li>
+  </ol>`},
+ {t:'Before your first flight', h:`
+  <div class="cols">
+   <div><h3>Do</h3><ul><li>Prepare a notepad</li><li>Listen to a frequency before talking</li><li>Read the ATIS</li><li>Be respectful of others’ time</li><li>Read back instructions</li><li>Study guides and tutorials</li><li>Use common sense and pay attention</li><li>Ask questions in atc-24-chat</li></ul></div>
+   <div><h3>Don’t</h3><ul><li>Talk over someone</li><li>Make unnecessary transmissions</li><li>Fly without contacting ATC</li><li>Shout on frequency</li><li>Be impatient</li><li>Play music or soundboards</li><li>Act without permission</li><li>Fake emergencies</li><li>Fly with zero knowledge of the basics</li></ul></div>
+  </div>`},
+ {t:'Pilot and ATC responsibilities', h:`
+  <div class="cols">
+   <div><h3>Pilot</h3><ul><li>Know how to fly your aircraft and its limits</li><li>Follow ATC instructions</li><li>Be mindful of other aircraft</li><li>Learn the basic procedures</li><li>Correct or report mistakes and conflicts</li><li>Be professional and make reasonable requests</li></ul></div>
+   <div><h3>ATC</h3><ul><li>Guide pilots to their destination</li><li>Keep aircraft safely separated, on the ground and in the air</li><li>Provide clearances</li><li>Coordinate with pilots and other controllers</li><li>Handle several aircraft at once</li><li>Avoid unreasonable or unrealistic instructions</li></ul></div>
+  </div>`},
+ {t:'The ATC24 Discord', h:`
+  <p>All communication in ATC24 happens in Discord voice chats. These channels matter most to a pilot:</p>
+  ${DL([['#atc-24-rules','Player rules. Read them.'],['#atc-24-charts','Airport charts'],['#atc-24-resources','Callsign table, tools and extra links'],['#atc-24-chat','General chat and questions. Controllers may ping you here.'],['#atc-24-link','Link to join the private server. Do not share it.'],['#flight-plans','Where you file a flight plan'],['#atis-information','Current ATIS for each airport'],['#bot-commands','Run commands such as /charts']])}`},
+ {t:'Scared of talking to ATC?', h:`
+  <p>The guide gives five reasons to relax.</p>
+  <ol><li>Some controllers are new too.</li><li>You are not the only new pilot.</li><li>Even professionals make mistakes.</li><li>You get used to it as flights repeat.</li><li>Most players are around 13 to 20 and here to have fun.</li></ol>
+  <p>The author’s own tip: if you get a clearance you did not catch, write it down and ask ATC to repeat it. Then read it back. A correct readback is the point where the fear drops.</p>`}
+],
+quiz:[
+ Q('ATC24 is the official ATC roleplay server for which game?','Pilot Training Flight Simulator (PTFS) on Roblox','Microsoft Flight Simulator','Infinite Flight','X-Plane','It is built on PTFS.'),
+ Q('Which standard is ATC24 phraseology based on?','ICAO','Whatever public PTFS servers use','Roblox chat slang','Military radio only','Basic ICAO standards.'),
+ Q('Which devices are NOT supported for flying in ATC24?','Consoles','Phones','Tablets','Laptops','Consoles can only be used for Discord.'),
+ Q('Which item is a requirement to fly?','A working microphone','A flight yoke','A paid subscription','A real pilot licence','Any microphone will do, even a phone.'),
+ Q('Which PTFS setting should be on before you fly?','Infinite Fuel','Random weather','Fuel emergencies','Auto-landing','Fuel emergencies are not a thing here.'),
+ Q('How is all communication done in ATC24?','Discord voice chats','Roblox text chat','Discord text chat only','In-game radio item','Each frequency is a voice channel.'),
+ Q('Which of these is on the DON’T list?','Faking an emergency','Reading the ATIS','Reading back instructions','Asking questions in atc-24-chat','Fake hijackings, fuel or pressure emergencies are banned.'),
+ Q('Which is a pilot responsibility?','Following ATC instructions','Ensuring separation of aircraft','Issuing clearances','Assisting other controllers','The others belong to ATC.'),
+ Q('Which is an ATC responsibility?','Ensuring safe separation of aircraft','Choosing your cruising altitude','Setting your squawk yourself','Filing your flight plan','Separation is the controller’s job.'),
+ Q('Where do you file a flight plan?','#flight-plans','#atis-information','#atc-24-rules','#atc-24-charts','Use the /createflightplan command there.'),
+ Q('Which is one of the guide’s reasons not to be scared of ATC?','Some controllers are new too','A mistake never matters','Nobody listens to the frequency','Controllers cannot hear you','Many controllers are learning as well.'),
+ Q('What is the typical age range of ATC24 players, according to the guide?','13 to 20','8 to 12','25 to 40','Over 40','Most are aviation enthusiasts of that age.'),
+ Q('What level of realism does ATC24 aim for?','Basic core concepts, with many things simplified','Full airline-level realism','No realism at all','Military-grade realism','It is designed for beginners.'),
+ Q('What should you do before you start talking on a frequency?','Listen first','Say your callsign immediately','Mute the channel','Ask in text chat','Listening avoids stepping on others.'),
+ Q('Which of these is a DO?','Read the ATIS','Play music on frequency','Talk while someone else is talking','Take off without contacting ATC','The ATIS gives you the runways in use.'),
+ Q('Why do you need a notepad?','To write down clearances and instructions','To draw taxi routes for ATC','To hide your callsign','To store your squawk forever','You will copy clearances as they are read.'),
+ Q('Can you use the guide for real-world aviation procedures?','No, it is for ATC24 only','Yes, it follows real manuals exactly','Yes, for FAA procedures','Yes, for ICAO procedures','It does not use official real-world manuals.'),
+ Q('How does the guide suggest you use it as a quick reference?','Bookmark it','Print it and carry it','Memorise it in one day','Copy it to a new document','The author asks you not to copy it, since it keeps being updated.'),
+ Q('Which section should you read if you only want to know what to say to ATC?','Section 6','Section 1','Section 3','Section 9','Section 6 is the full IFR flight.'),
+ Q('What should you do if you did not catch part of a clearance?','Ask them to say again, then read it back','Ignore it and guess','Say “repeat” twice','Leave the frequency','Never guess a clearance.')
+]},
+
+/* ===== 2 ===== */
+{ id:'faq', title:'Frequently asked questions', focus:'Answers to the questions almost every new pilot asks.',
+chapters:[
+ {t:'About the guide', h:`
+  ${DL([['Why so long?','It was built to solve about 90% of your problems.'],['Can I share it?','Yes, with credit and the correct link.'],['Do I read everything?','Not everything, but it helps if you want to survive here.']])}`},
+ {t:'Joining and equipment', h:`
+  ${DL([['Listen without flying?','Yes. Join a voice chat and listen. It is a good way to learn.'],['Fly without a mic?','No. You must speak to ATC, on any device.'],['Use chat instead?','No. Text makes it harder for ATC to give instructions.'],['Requirement to fly?','Only the ATC24 role, shown by a check mark next to your name.'],['Official training?','None, though unofficial servers offer it.'],['Like VATSIM?','In concept yes, realistically no.']])}`},
+ {t:'Rules and limits', h:`
+  ${DL([['Emergencies','Only engine failure and landing gear failure. You cannot force one.'],['Hijackings','Not allowed. They can lead to a strike or ban.'],['Real accidents','Do not recreate them. It is disrespectful.'],['Out of fuel','You should have Infinite Fuel on.'],['Callsign','Any appropriate callsign. You may use airlines that do not exist in game.'],['Virtual airline','Not required. They have no affiliation with ATC24 staff.'],['Aircraft allowed','All aircraft, including helicopters, can fly IFR. Not all can fly VFR.'],['A380 / An-225','Allowed, but only at airports that can take their size. Not St. Barthelemy.'],['SID / STAR','Not required.'],['Stopovers','File a new flight plan for each leg.']])}`},
+ {t:'Where and when to fly', h:`
+  ${DL([['Busy airports','Rockford, Tokyo, Perth, Larnaca, Mellor'],['Quiet airports','Izolirani, Sauthemptona, Keflavik, Paphos and smaller airfields'],['Why is Rockford packed?','It is the biggest airport in PTFS and sits in the centre of the map.'],['Quiet times','Weekdays, 7:00 PM to 9:00 AM UTC'],['Peak times','Weekends, 10:00 AM to 6:00 PM UTC, plus holidays and breaks'],['Which airport first?','A smaller or less busy one.']])}
+  ${NOTE('If you are nervous about talking, pick a quiet airport. Many people on frequency are in the same position as you.','Tip')}`}
+],
+quiz:[
+ Q('Can you join a voice chat just to listen?','Yes, it is a good way to learn','No, you must always transmit','Only if you are a controller','Only on weekends','Listening is encouraged.'),
+ Q('Can you fly without a microphone?','No, you must speak to ATC','Yes, using only text chat','Yes, with a keyboard shortcut','Yes, at quiet airports','Any device with a mic works.'),
+ Q('Why is text chat not an acceptable replacement for the radio?','It makes it harder for ATC to give instructions','It is too slow for Roblox','It costs extra','It is hidden from controllers by Discord','ATC24 runs on voice.'),
+ Q('Which emergencies are allowed in ATC24?','Engine failure and landing gear failure','Hijacking and fuel emergency','Radio failure and cabin pressure loss','Any emergency you choose','Everything else is against the rules.'),
+ Q('What can happen if you fake a hijacking?','A strike or ban','A free upgrade','Nothing','A priority landing','It is insensitive and not allowed.'),
+ Q('May you recreate a real-life accident?','No','Yes, for training','Yes, with permission from ATC','Yes, if it is old enough','It is disrespectful to those affected.'),
+ Q('How do you handle a stopover?','File a new flight plan for each leg','Keep the first flight plan','Tell ATC in text chat','File one plan for both legs','Each leg needs its own plan.'),
+ Q('Which list shows airports that are usually busy?','Rockford, Tokyo, Perth, Larnaca, Mellor','Izolirani, Sauthemptona, Keflavik, Paphos','Skopelos, Bird Island, Lukla','Training Centre, Boltic, Garry','These are the busiest.'),
+ Q('Which airport is usually NOT busy?','Izolirani','Rockford','Tokyo','Perth','Small airfields are quieter.'),
+ Q('When does ATC24 have low activity on weekdays?','7:00 PM to 9:00 AM UTC','9:00 AM to 7:00 PM UTC','Midnight to 1 AM UTC only','Never','Adjust it to your own timezone.'),
+ Q('When does ATC24 usually peak?','Weekends, 10:00 AM to 6:00 PM UTC','Weekdays at 3 AM UTC','Mondays only','Only during events','Holidays and breaks count too.'),
+ Q('What is the only requirement to fly?','The ATC24 role','Completing a training course','Joining a virtual airline','A real pilot licence','Shown by a check mark next to your name.'),
+ Q('Does ATC24 offer official training?','No, but unofficial servers do','Yes, a mandatory course','Yes, a weekly class','Only for controllers','There is no official training.'),
+ Q('Do you need to be in a virtual airline to fly?','No','Yes','Only for cargo flights','Only at Rockford','They are roleplay groups without official endorsement.'),
+ Q('Must you fly a SID or STAR?','No, they are not required','Yes, always','Only at night','Only above FL30','You can ask for radar vectors.'),
+ Q('Why are there so many players at Rockford?','It is the biggest, most central airport','It has the shortest runway','It is the only one with ATC','It gives bonus XP','Size and central location.'),
+ Q('May you land an A380 or An-225 at St. Barthelemy?','No','Yes, with permission','Yes, in daylight only','Only the An-225','Their size limits which airports they can use.'),
+ Q('Which aircraft may fly IFR?','All aircraft, including helicopters','Only airliners','Only jets','Only aircraft above FL30','Not all can fly VFR though.'),
+ Q('Is ATC24 like VATSIM?','In concept yes, realistically no','Exactly the same','It is a part of VATSIM','Not at all in concept','Both have pilots and controllers, but ATC24 is simplified.'),
+ Q('What if you run out of fuel in ATC24?','You should have Infinite Fuel on','Declare a fuel emergency','Request a tow','Land immediately','Fuel emergencies are not allowed.')
+]},
+
+/* ===== 3 ===== */
+{ id:'preparation', title:'Preparation and planning', focus:'Everything you settle before you spawn: phonetics, ATIS, callsigns, altitudes and the flight plan.',
+chapters:[
+ {t:'NATO phonetic alphabet', h:`
+  <p>Created in 1956, it replaces letters with standard words so messages survive a bad radio. Use it for callsign letters, taxiways, ATIS letters and SID/STAR names. “Taxiway D1” becomes “Taxiway Delta One”, and “Information E” becomes “Information Echo”.</p>
+  <div class="grid">${[['A','Alfa'],['B','Bravo'],['C','Charlie'],['D','Delta'],['E','Echo'],['F','Foxtrot'],['G','Golf'],['H','Hotel'],['I','India'],['J','Juliet'],['K','Kilo'],['L','Lima'],['M','Mike'],['N','November'],['O','Oscar'],['P','Papa'],['Q','Quebec'],['R','Romeo'],['S','Sierra'],['T','Tango'],['U','Uniform'],['V','Victor'],['W','Whiskey'],['X','X-ray'],['Y','Yankee'],['Z','Zulu']].map(x=>`<div><b>${x[0]}</b>${x[1]}</div>`).join('')}</div>`},
+ {t:'ATIS', h:`
+  <p>The Automatic Terminal Information Service tells you the status of an airport. ATC24 uses a text ATIS in #atis-information. Information letters run A to Z, then restart at A. Use the ATIS of your departure airport when you request clearance, and the ATIS of your arrival airport on first contact with the destination Center.</p>
+<pre>IRFD ATIS INFO S TIME 0101Z
+DEP RWY 25L ARR RWY 25C 25R
+075/08 9999 OVC019 09/15 Q1014
+TRANSITION LEVEL 030
+ACKNOWLEDGE RECEIPT OF INFORMATION S</pre>
+  <h3>The only parts you really need</h3>
+  <ul><li>The current information letter (here, Sierra)</li><li>The runways in use (departure 25L, arrival 25C and 25R)</li><li>To acknowledge it and state your aircraft type</li></ul>
+  ${DL([['075/08','Wind 075° at 8 knots'],['9999','Visibility over 10 km (always 9999 in ATC24)'],['OVC019','Overcast at 1,900 ft. SCT is scattered, FEW is few, BKN is broken'],['09/15','Temperature and dewpoint'],['Q1014','QNH 1014 hPa'],['A2992','Altimeter 29.92 inHg. QNH and altimeter are the same setting in different units']])}`},
+ {t:'Aviation numbers', h:`
+  <p>Say 3 as “tree” or “three”, 5 as “fife” or “five”, and 9 as “niner” or “nine”. Say 0 as “zero”.</p>
+  <h3>Flight numbers</h3>
+  ${TBL(['Callsign','FAA style','ICAO style'],[['UAL123','United One Twenty-Three','United One Two Three'],['UAL1234','United Twelve Thirty-Four','United One Two Three Four']])}
+  <h3>Frequencies</h3>
+  <p>ATC24 uses Discord voice chats named <code>[STATION | FREQUENCY]</code>. Say digits one by one, with “decimal” or “point”. Drop two trailing zeros.</p>
+  ${DL([['120.400','One Two Zero decimal Four'],['118.100','One One Eight decimal One'],['124.850','One Two Four decimal Eight Five']])}`},
+ {t:'Types of ATC', h:`
+  ${DL([['Ground (GND)','IFR clearances, startup, pushback and taxiway movement. Small airports may have none.'],['Tower (TWR)','Takeoff and landing clearances, runway crossings, VFR in the control zone.'],['Center (CTR / -CC)','Departures, approaches, airspace crossings and top-down service. Center channels all end in -CC.']])}
+  <p>Delivery, Departure and Approach exist only in events. Delivery is folded into Ground, and Departure and Approach into Center.</p>`},
+ {t:'Making a callsign', h:`
+  <p>File the airline’s three-letter ICAO code plus your flight number, and speak the radio callsign. Emirates is ICAO <code>UAE</code> with the radio callsign “Emirates”, so UAE789 is “Emirates Seven Eight Niner”. The two-letter code you see on tickets (EK) is the IATA code, which you do not file.</p>
+  <h3>Rules</h3>
+  <ul><li>7 characters maximum</li><li>At most 2 letters, and they come after the numbers</li><li>At least one number, and an ICAO code is required</li><li>The number may start with zero, for example DLH09X</li></ul>
+  ${TBL(['Callsign','Valid?'],[['UAE16R','<span class="good">Yes</span>'],['UAE12ABC','<span class="bad">No, three letters</span>'],['UAEA','<span class="bad">No, no number</span>'],['UAEAB12','<span class="bad">No, letters first</span>'],['1234','<span class="bad">No, no ICAO code</span>']])}
+  <p>You may also fly a registration such as N22318, written without hyphens (G-BVXR becomes GBVXR). Never use callsigns of real-life accidents, which can earn a strike. Airlines that are not in PTFS are fine if you use the correct ICAO code.</p>`},
+ {t:'Types of IFR flight', h:`
+  ${DL([['Direct (DCT)','Fly straight to the destination. Expect vectors anyway.'],['Radar Vectors (RDV)','ATC tells you heading, altitude and speed. The author’s top recommendation.'],['Route','SIDs, STARs and waypoints. Longer and not for beginners.'],['Non-standard','Circuits, AWACS, formations and similar.']])}
+  <p>“GPS Direct” is fictional and redundant, since you still get vectors. Professionals use plain DCT.</p>`},
+ {t:'Feet vs flight levels', h:`
+  <p>Flight Level is altitude in feet divided by 100. FL30 is 3,000 ft, FL40 is 4,000 ft, FL100 is 10,000 ft. Say “flight level three zero”, and never start with a zero (not “zero three zero”).</p>
+  <p>ATC24 merges the transition altitude and level into one value: <b>FL30</b>. Below 3,000 ft use feet. At 3,000 ft and above use flight levels. FL20 and FL10 are wrong.</p>
+  <ul><li>Feet are used in 1000s, 500s or 100s. Flight levels in 1000s only.</li><li>Altitudes like 1,500 or FL025 are mostly for VFR. IFR cruise altitudes are always in 1000s.</li><li>Never fly above your aircraft’s maximum altitude.</li></ul>`},
+ {t:'Semicircular rule', h:`
+  <p>Altitude depends on your magnetic track. Eastbound uses odd levels, westbound uses even levels.</p>
+  ${TBL(['Track','Direction','IFR levels'],[['000° to 179°','Eastbound','Odd: FL30, FL50, FL70…'],['180° to 359°','Westbound','Even: FL20, FL40, FL60…']])}
+  <p><b>Heading</b> is where the nose points, and north is 360°. <b>Track</b> is the path you actually fly, and north is 000°.</p>
+  ${NOTE('The rule is recommended, not required, though controllers may amend your plan. It is strictly enforced only in events.')}`},
+ {t:'Filing a flight plan', h:`
+  <p>Be in the private server first, then use <code>/createflightplan</code> in #flight-plans.</p>
+  <ol><li><b>In-game callsign:</b> the one above your plane</li><li><b>Callsign:</b> the one ATC will use</li><li><b>Aircraft:</b> for example A320</li><li><b>Flight rules:</b> IFR</li><li><b>Departing:</b> airport name, not ICAO code</li><li><b>Arrival:</b> airport name</li><li><b>Flight level:</b> 030, 040, 050… never 025 or 035 for IFR</li><li><b>Route</b> (optional): blank becomes DCT or RDV</li></ol>
+  ${NOTE('If you can spawn the aircraft at an airport, you may fly there. An A350 cannot spawn at Sauthemptona, so it cannot fly there. Restricted military aircraft cannot be filed at civil airports either.','Rule')}`},
+ {t:'Features you pretend to use', h:`
+  <p>PTFS cannot simulate everything, so ATC24 keeps some features as roleplay.</p>
+  ${DL([['Squawk','A 4-digit code from ATC, digits 0 to 7 only. There is no transponder. The number on your plane is the in-game callsign, not the squawk.'],['ILS','A localizer (lateral) and glideslope (vertical). All approaches are flown visually, so you pretend to be established.'],['Altimeter','Air pressure is not simulated. You pretend to set what ATC gives you.']])}
+  ${TBL(['Setting','Reference','Unit'],[['QNH','Mean sea level','hPa'],['QFE','Aerodrome','hPa or inHg'],['QNE','Standard atmosphere','1013.25 hPa / 29.92 inHg']])}
+  <p>Only QNH and altimeter appear in the ATC24 ATIS.</p>`},
+ {t:'Heavy and Super', h:`
+  <p>Wake turbulence categories show how strong an aircraft’s wingtip vortices are. This is why departures wait 2 to 3 minutes behind each other.</p>
+  ${TBL(['Category','Code','Spoken?','Examples'],[['Light','L','No','C172, LJ45'],['Medium','M','No','A320, B738'],['Heavy','H','Optional','B744, A359, MD11'],['Super','J','Optional','A388, A225']])}
+  <p>Only the A380 and An-225 are Super. Heavy goes on the aircraft line, not in the callsign: callsign <code>CPA486</code>, aircraft <code>B77W/H</code>. Over the radio: “Cathay 486 Heavy”. A heavy cannot say Super, and a Super cannot say Heavy.</p>`}
+],
+quiz:[
+ Q('How is “Taxiway D1” spoken?','Taxiway Delta One','Taxiway Dee One','Taxiway Dog One','Taxiway Denmark One','Taxiways use the NATO alphabet.'),
+ Q('What happens to the ATIS letter after Z?','It restarts at A','It stops','It becomes AA','It becomes 1','Letters cycle A to Z.'),
+ Q('Which ATIS items matter most for ATC24?','Current letter, runways in use, aircraft type acknowledgement','Visibility and dewpoint','Cloud base and temperature','Time and wind only','The rest is optional decoding.'),
+ Q('What is the transition level in ATC24?','FL30','FL10','FL50','FL100','Transition altitude and level are merged.'),
+ Q('How do you say 124.850?','One Two Four decimal Eight Five','One Twenty-four point Eight Fifty','One Two Four Eight Five Zero','Twelve Four decimal Eighty-five','Digits one by one; drop two trailing zeros.'),
+ Q('Which spoken digits are correct?','Tree, fife, niner','Tri, five-er, nine-er','Thir, fiv, nin','Three, five, nine only, never variants','These are the accepted variants.'),
+ Q('Who handles IFR clearances and pushback?','Ground','Tower','Center','Approach','Ground (with Delivery folded in).'),
+ Q('Who handles takeoff and landing clearances?','Tower','Ground','Center','Delivery','And runway crossings.'),
+ Q('What do Center voice channel names end with?','-CC','-GG','-TT','-CTR','For example IRCC.'),
+ Q('When do Delivery, Departure and Approach exist?','Only in events','Always','Only at night','Only at Rockford','Otherwise they are merged into Ground and Center.'),
+ Q('Which ICAO code do you file for Emirates?','UAE','EK','EMI','EMR','EK is the IATA code.'),
+ Q('What is the maximum length of a callsign?','7 characters','4 characters','10 characters','No limit','Seven maximum.'),
+ Q('Which callsign is valid?','UAE16R','UAE12ABC','UAEA','UAEAB12','At most 2 letters, after the numbers.'),
+ Q('Which flight type does the author recommend most?','Radar Vectors','Route with SID/STAR','GPS Direct','Non-standard IFR','ATC gives heading, altitude and speed.'),
+ Q('4,000 ft is which flight level?','FL40','FL4','FL400','FL04','Divide by 100.'),
+ Q('Which flight levels do you use eastbound (track 000° to 179°)?','Odd','Even','Any','Only FL100','Westbound uses even.'),
+ Q('How is north expressed for heading and for track?','360° for heading, 000° for track','000° for both','360° for both','090° for heading','Heading and track use different conventions.'),
+ Q('Which squawk digits are possible?','0 to 7 only','0 to 9','1 to 5','A to F','There is no 8 or 9.'),
+ Q('Which aircraft carry the Super designator?','A380 and An-225','B747 and B777','A350 and B787','Only the C-17','All others are Heavy or lower.'),
+ Q('Where does the Heavy suffix go when filing?','On the aircraft, for example B77W/H','In the callsign','In the route','In the flight level','Not in the callsign.')
+]},
+
+/* ===== 4 ===== */
+{ id:'radiotelephony', title:'Radiotelephony', focus:'Words and phrases. The vocabulary of every call.',
+chapters:[
+ {t:'Phraseology in ATC24', h:`
+  <p>Radiotelephony is voice communication between pilots and ATC. ATC24 uses basic ICAO standards and has no single local phraseology, so players may use theirs: ICAO-E, FAA, UK CAA, CASA and others. The guide itself teaches basic ICAO-E.</p>`},
+ {t:'Acronyms', h:`
+  <div class="grid">${[['RDV','Radar Vectors'],['DCT','Direct'],['FPL','Flight plan'],['RWY','Runway'],['TWY','Taxiway'],['GND','Ground'],['TWR','Tower'],['CC / ACC','Center / Control'],['DEL','Delivery'],['DEP','Departure'],['APP','Approach'],['SID','Standard Instrument Departure'],['STAR','Standard Terminal Arrival Route'],['ATIS','Automatic Terminal Information Service'],['ACFT','Aircraft type'],['FL','Flight level'],['CRZ','Cruising flight level'],['TL','Transition level'],['ILS','Instrument Landing System'],['VIS APP','Visual approach'],['RNAV','Area navigation'],['RNP','Required navigation performance'],['LDA','Localizer-type directional aid'],['IGS','Instrument guidance system'],['WPT','Waypoint'],['FIR','Flight information region'],['DME','Distance measuring equipment'],['GA','General aviation']].map(x=>`<div><b>${x[0]}</b><i>${x[1]}</i></div>`).join('')}</div>`},
+ {t:'General terms', h:`
+  ${DL([['Affirm / Negative','Yes / No'],['Able / Unable','I can / I cannot'],['Roger','Acknowledged'],['Wilco','Will comply'],['Standby','Wait'],['Say again','Repeat what you said'],['Say again slower','Say it slowly please'],['Correction','I made an error, here is the right one'],['Disregard','Ignore'],['Cancel','Ignore the previous instruction'],['Cleared','Authorized'],['Approved','Permission granted'],['Request','Asking for something'],['Report','Tell ATC immediately'],['Advise','Let me know'],['Confirm','Verify'],['Be advised','Just to let you know'],['Readback','Repeat the instruction told to you'],['Monitor','Join and wait, do not speak unless spoken to'],['Expect','This is what you will get'],['Initial climb','The altitude you climb to first and hold until advised'],['Intentions','What you want or plan to do'],['Break','Separation between two parts of a message'],['All stations','Everybody on the frequency']])}
+  ${NOTE('Use “say again”, not “repeat”. Repeat is a military term meaning “fire again”.','Careful')}`},
+ {t:'Movement instructions', h:`
+  ${DL([['Hold short','Stop before something, such as a runway'],['Line up and wait','Enter the runway and wait'],['Cross','Move across a runway'],['Give way','Let the other aircraft go first'],['Behind','Follow the aircraft ahead of you'],['Push and start','Push back and start the engines'],['Startup approved','You may start the engines'],['Face','Point your nose in this direction'],['Maintain','Keep this heading, speed or altitude'],['Expedite','Do it quickly'],['Vacate','Exit the runway'],['Go-around / missed approach','Abort your landing'],['Intersection departure','Depart from a point that is not at the runway threshold'],['Inbound / Outbound','Coming to / going to'],['Fly runway heading','Fly straight, aligned with the runway'],['Vectors','Heading, altitude and speed instructions']])}`},
+ {t:'Aerodrome terms', h:`
+  ${DL([['QNH','Pressure in hectopascals (hPa)'],['Altimeter','Pressure in inches of mercury (inHg)'],['Holding point','Where an aircraft waits before the runway'],['Intersection','Where taxiways or runways meet'],['Apron / ramp','Parking area'],['Stand / gate / bay','One aircraft parking spot'],['Remote stand','A stand that is not next to a terminal'],['Threshold','The end of a runway'],['Traffic','Another aircraft'],['O’clock position','Where something is relative to you, as on a clock face'],['Zulu time','UTC'],['Aerodrome','Any place aircraft operate from, such as an airport, airfield or airbase']])}`},
+ {t:'Commonly used phrases', h:`
+  ${DL([['“Standby for clearance”','Wait for your clearance'],['“Clearance available”','Your clearance is ready'],['“Advise ready to copy”','Tell me when you are ready to write'],['“At own discretion”','It is up to you'],['“Cleared ILS approach”','Align with the runway and approach'],['“Descend via the glidepath”','Follow the glidepath down, using PAPI as reference'],['“Request frequency change”','Ask ATC to hand you over'],['“Remain on this frequency”','Stay here'],['“Report field in sight”','Tell ATC when you see the airport'],['“Vacate left/right when able”','Take the next exit'],['“Pass your message” / “Go ahead”','Continue with your transmission'],['“Last station, callsign only”','Whoever just spoke, say only your callsign'],['“Cruising altitude is invalid for direction of flight”','Your altitude breaks the semicircular rule'],['“In case of missed approach, track runway heading, climb XXXX”','What to do if you go around']])}`}
+],
+quiz:[
+ Q('Which word should you use instead of “repeat”?','Say again','Rerun','Echo','Replay','Repeat is a military term meaning fire again.'),
+ Q('What does “affirm” mean?','Yes','No','Wait','Ignore','Negative means no.'),
+ Q('What does “unable” mean?','I cannot','I can','Wait','Yes','Able means I can.'),
+ Q('What does “wilco” mean?','Will comply','Wait a little','Which course','Without conflict','It shows you will follow.'),
+ Q('What does “roger” mean?','Acknowledged','Cleared','Repeat','Negative','It is not a readback.'),
+ Q('What does “standby” mean?','Wait','Hurry','Land','Ignore','Do not call back, ATC will.'),
+ Q('What is a “readback”?','Repeating the instruction you were given','Reading the ATIS aloud','Reading the chart','Reading your callsign twice','ATC then confirms it was understood.'),
+ Q('What does “monitor” mean?','Join and wait without speaking unless spoken to','Talk on frequency continuously','Watch the radar','Turn off your radio','Typical when switching to Tower.'),
+ Q('What does “vacate” mean?','Exit the runway','Park the aircraft','Climb quickly','Land long','Clear the runway promptly.'),
+ Q('What is a go-around?','Aborting your landing','A taxi loop','A holding pattern','A visual approach','Also called a missed approach.'),
+ Q('What does “expedite” mean?','Do it quickly','Do it later','Do not do it','Wait','Often used when someone is using the runway.'),
+ Q('QNH is measured in…','Hectopascals (hPa)','Inches of mercury','Knots','Feet','Altimeter uses inHg.'),
+ Q('What is an apron (ramp)?','A parking area for aircraft','The end of the runway','A taxiway crossing','A hangar door','Stands are the individual spots.'),
+ Q('What does “threshold” refer to?','The end of a runway','A speed limit','The transition level','The glideslope','Where the runway begins.'),
+ Q('What does “Zulu time” mean?','UTC','Local time','Eastern time','Pacific time','Zulu equals UTC.'),
+ Q('What does “last station, callsign only” ask?','The last speaker should say only their callsign','Everyone leaves the frequency','Say your altitude','Stop transmitting for a minute','Used when ATC cannot tell who spoke.'),
+ Q('Which phrase asks to be handed to the next controller?','Request frequency change','Pass your message','Say again slower','At own discretion','Useful if ATC forgets to hand you off.'),
+ Q('What does ILS stand for?','Instrument Landing System','Interim Landing Signal','Instrument Lateral Sequence','Initial Level Setting','It has localizer and glideslope.'),
+ Q('What does “initial climb” mean?','The altitude you climb to first and hold until advised','Your final cruising altitude','The minimum safe altitude','The go-around altitude','Part of the IFR clearance.'),
+ Q('What does “intersection departure” mean?','Departing from a point away from the runway threshold','Crossing a runway intersection','Departing at night','Departing without a clearance','It is a takeoff from a taxiway partway along the runway.')
+]},
+
+/* ===== 5 ===== */
+{ id:'airspace', title:'Airspace and UNICOM', focus:'The PTFS map: who controls what, and what to do when nobody does.',
+chapters:[
+ {t:'Airspaces (FIRs)', h:`
+  <p>Each island group has a Flight Information Region with its own Center controller.</p>
+  ${TBL(['FIR','Center','Frequency','Airports'],[
+   ['Rockford','IRCC','124.850','Rockford, Mellor, Garry, Training Centre, Boltic'],
+   ['Sauthemptona','ISCC','127.825','Sauthemptona'],
+   ['Grindavik','IGCC','126.750','Keflavik, Pingyeri'],
+   ['Orenji','IOCC','132.300','Tokyo, Saba, Bird Island'],
+   ['Perth','IPCC','135.250','Perth, Lukla'],
+   ['Izolirani','IZCC','125.650','Scampton, Al Najaf, Izolirani'],
+   ['Cyprus','ICCC','126.300','Larnaca, McConnell AFB, Henstridge, Paphos'],
+   ['Barthelemy','IBCC','128.600','St. Barthelemy, Skopelos']])}
+  ${NOTE('Unofficial names such as “Rockford Control” or “Manchester Radar” are not allowed, though some controllers still use them.')}`},
+ {t:'Aerodromes', h:`
+  <p>An aerodrome is any area where aircraft operate: airports, airfields, military bases and grass strips. All airports are aerodromes, but not all aerodromes are airports. Seabases are prohibited in ATC24.</p>
+  <p>Each has a 4-letter ICAO code (IRFD for Rockford) used only in flight plans, ATIS and charts. On the radio say the name: “Rockford Tower”, never “I-R-F-D Tower”. The 2-letter IATA code is for tickets. PTFS codes start with I because no real region uses it.</p>
+  <p>Charts are available in #atc-24-charts, with the /charts command in #bot-commands, and on ptfs.app.</p>`},
+ {t:'Top-down service', h:`
+  <p>If a controller position is offline, the next higher position covers it. The order never works in reverse.</p>
+  ${TBL(['If this is offline…','…contact'],[['Ground','Tower'],['Tower','Center'],['Center','Monitor UNICOM']])}
+  <p>Think of an older sibling doing the chores of a younger one who is away. The younger one cannot do the older one’s chores.</p>
+  ${NOTE('Flying to Perth with IPCC offline but IPPH Tower and Ground online? Stay on IPCC until you approach the runway. Tower cannot cover Center.','Example')}`},
+ {t:'UNICOM and CTAF', h:`
+  <p>When no controller is available you self-announce. In ATC24 this means any Center channel with nobody on it. You still join the frequency, which is called <b>monitoring</b>. If handed to an empty sector you will hear “Monitor UNICOM” or “Monitor Barthelemy Advisory at 128.600”. Switch and stay.</p>
+  <h3>Self-announce format</h3>
+  <pre>[Place] Traffic, [callsign], [position / intentions], [place]</pre>
+  ${P('Barthelemy Traffic, American 1234 at FL40, heading 360, proceeding to Tokyo, Barthelemy.')}
+  ${P('Barthelemy Traffic, Jersey 4321 taking off Runway 09, Barthelemy.')}`},
+ {t:'Waypoints, SIDs and STARs', h:`
+  <p>These are covered in the separate ATC24 Advanced IFR Guide. They are recommended but not required for the basic course.</p>`}
+],
+quiz:[
+ Q('What is the Rockford Center frequency?','124.850','132.300','135.250','128.600','IRCC.'),
+ Q('Which FIR does Tokyo belong to?','Orenji','Rockford','Perth','Cyprus','Controlled by IOCC at 132.300.'),
+ Q('Which FIR includes Keflavik?','Grindavik','Izolirani','Barthelemy','Sauthemptona','IGCC at 126.750.'),
+ Q('Which FIR includes Larnaca?','Cyprus','Perth','Orenji','Rockford','ICCC at 126.300.'),
+ Q('What is the Perth Center frequency?','135.250','125.650','127.825','126.750','IPCC.'),
+ Q('Which Center is on 128.600?','Barthelemy','Izolirani','Sauthemptona','Orenji','IBCC.'),
+ Q('Which Center is on 125.650?','Izolirani','Grindavik','Cyprus','Rockford','IZCC.'),
+ Q('Which airport is in the Rockford FIR?','Mellor','Tokyo','Larnaca','Perth','Along with Garry, Boltic and others.'),
+ Q('How do you refer to IRFD_TWR on the radio?','Rockford Tower','I-R-F-D Tower','India Romeo Foxtrot Delta Tower','Rockford Control','Use the airport name.'),
+ Q('Why do PTFS ICAO codes begin with “I”?','No real-world region uses that letter','It stands for Island','It stands for IFR','It is random','A deliberate choice.'),
+ Q('Where can you find charts?','#atc-24-charts, /charts, ptfs.app','Only in game','Only on YouTube','Only from controllers','Three official routes.'),
+ Q('What is the top-down order?','Center, Tower, Ground','Ground, Tower, Center','Tower, Center, Ground','Ground, Center, Tower','Higher positions cover lower ones.'),
+ Q('If Ground is offline, whom do you contact?','Tower','Center','Nobody','Ground again','Tower covers Ground.'),
+ Q('If Tower is offline, whom do you contact?','Center','Ground','Departure','UNICOM','Center covers Tower.'),
+ Q('If Center is offline and you are handed over, what do you do?','Monitor UNICOM on that frequency','Stay with the old Center','Switch to Tower','Switch off the radio','You self-announce.'),
+ Q('You approach Perth with IPCC offline but IPPH Tower online. What do you do?','Stay on IPCC until near the runway, then Tower','Contact Tower at once','Contact Ground','Leave the server','Tower cannot cover Center.'),
+ Q('What is UNICOM in ATC24?','A Center channel with no controller','A separate 122.800 channel','A type of chart','A tool','It is called monitoring.'),
+ Q('Which is a correct self-announcement?','Barthelemy Traffic, Jersey 4321 taking off Runway 09, Barthelemy','Hey everyone, I’m taking off','Takeoff 09, please','Jersey 4321 requests takeoff','Place, callsign, position or intention, place.'),
+ Q('Which statement is true?','All airports are aerodromes, but not all aerodromes are airports','All aerodromes are airports','Seabases are encouraged','An airfield is never an aerodrome','Airfields, bases and strips are also aerodromes.'),
+ Q('What is the IATA code used for?','Tickets and commercial use','Radio calls','Flight plans','ATIS','ICAO codes are used by pilots and ATC.')
+]},
+
+/* ===== 6 ===== */
+{ id:'full-flight', title:'A full IFR flight', focus:'The flight itself. This is what you will say to ATC.',
+chapters:[
+ {t:'Scenario and readbacks', h:`
+  <p>The guide flies a radar vector flight from Rockford (IRFD) to Tokyo (ITKO) as AAL1234, a Boeing 777-300ER, cruising at 4,000 ft. If a controller forces a SID you cannot fly, decline it and ask for radar vectors.</p>
+  <p>A readback means repeating the instruction so ATC knows you understood. “Copy” and “roger” are not readbacks. Read back everything unless told otherwise.</p>`},
+ {t:'1 · IFR clearance', h:`
+  <p>Contact the lowest online position. Wait for a gap in the frequency, then use this order: callsign, aircraft, stand, current ATIS, request.</p>
+  ${P('Rockford Ground, American 1234, Stand 12, Boeing 777, Information W, request IFR clearance to Tokyo.')}
+  <h3>CRAFT</h3>
+  <p><b>C</b>learance · <b>R</b>oute · <b>A</b>ltitude · <b>F</b>requency · <b>T</b>ransponder</p>
+  ${A('American 1234, cleared to Tokyo via Radar Vectors, initial climb 2000 ft, expect FL30 2 minutes after departure, departure frequency 132.300, squawk 2263.')}
+  ${P('Cleared to Tokyo via Radar Vectors, initial climb 2000 ft, expect FL30 2 minutes after departure, departure frequency 132.300, squawk 2263, American 1234.')}
+  <ul><li>Read back only what you were given. If no departure frequency was given, do not say one.</li><li>Departure frequency is Center, not Tower. Tower handles takeoffs.</li><li>The squawk is given by ATC, not chosen by you.</li><li>Do not include your own route or squawk when you ask.</li><li>If something is wrong, ATC corrects you and you confirm the correction.</li></ul>
+  ${A('Readback correct, call for push.')}`},
+ {t:'2 · Pushback and taxi', h:`
+  ${P('Rockford Ground, American 1234, Stand 12, request push and start.')}
+  ${A('American 1234, push and start approved, face North, Rockford QNH 1013.')}
+  ${P('Push and start approved, face North, QNH 1013, American 1234.')}
+  <p>After pushback, open your ground chart and ask for taxi. ATC gives the route.</p>
+  ${P('Ground, American 1234, request taxi.')}
+  ${A('American 1234, taxi to holding point A5, Runway 25L, via K, A.')}
+  ${P('Taxi holding point A5, Runway 25L via K, A, American 1234.')}
+  <h3>Conditional clearance</h3>
+  ${A('American 1234, after the Lufthansa A320 passes from left to right, continue taxi on A.')}
+  <p>Move only after the condition is met, and read the condition back. Near the runway Ground hands you off.</p>
+  ${A('American 1234, contact Rockford Tower on 118.1.')}
+  ${P('118.1, American 1234.')}`},
+ {t:'3 · Takeoff and departure', h:`
+  ${P('Rockford Tower, American 1234, holding point A5.')}
+  <p>Tower will tell you to hold, line up and wait, or give takeoff clearance.</p>
+  ${A('American 1234, Rockford Tower, standby, traffic on final.')}
+  <p>When told to standby, say nothing, not even “standing by”.</p>
+  ${A('American 1234, Runway 25L, line up and wait.')}
+  ${P('Line up and wait 25L, American 1234.')}
+  ${A('American 1234, wind 120 degrees 6 knots, Runway 25L, cleared for takeoff.')}
+  ${P('Cleared for takeoff 25L, American 1234.')}
+  ${NOTE('Do not read back the winds. ATC24 allows 250 knots maximum below 3,000 ft, so use about 65 to 75% throttle in a jetliner.','Rule')}
+  <p>Departure means the takeoff and the phase after it. That is why the departure frequency is with Center. Once airborne:</p>
+  ${A('American 1234, contact Rockford Center on 124.85.')}
+  ${P('124.85, American 1234.')}
+  ${P('Rockford Center, American 1234, passing 1,200 ft for 2,000 ft.')}
+  ${NOTE('On first contact do not say heading or speed, and do not request radar contact. It is automatic.','Skip')}
+  ${A('American 1234, Rockford Center, radar contact, turn right heading 360, climb FL40.')}
+  ${P('Right heading 360, climb FL40, American 1234.')}
+  <p>Once you reach FL30 you may use maximum speed unless told otherwise.</p>`},
+ {t:'4 · Airspace crossings', h:`
+  ${A('American 1234, contact Barthelemy Center on 128.6.')}
+  ${P('128.6, American 1234.')}
+  ${P('Barthelemy Center, American 1234, FL40.')}
+  <p>Only callsign and altitude. No heading, speed, intentions or ATIS. If still climbing, give your current and cleared altitude. Pass along any restriction the previous controller gave you. Controllers may add “continue as filed” or “continue own navigation”.</p>
+  <p>If you are on the wrong frequency, a controller may ping you in atc-24-chat. Near the destination you may ask for descent.</p>
+  ${P('Center, American 1234, request descent to FL30.')}
+  ${A('American 1234, descend to FL30.')}`},
+ {t:'5 · Arrival and landing', h:`
+  <p>On first contact with the destination Center, add your ATIS information.</p>
+  ${P('Orenji Center, American 1234, FL30, Information D.')}
+  ${A('American 1234, Orenji Center radar contact, expect the ILS for Runway 31, turn left heading 360, descend to 2000 ft, Tokyo QNH 1013.')}
+  <p>“Expect the ILS” is a heads-up, not an approach clearance.</p>
+  ${A('American 1234, turn left heading 290, cleared ILS approach Runway 31, report once established.')}
+  <p>Because PTFS does not simulate ILS, every approach is effectively visual. Once cleared, align with the runway. Established roughly means aligned with the runway at the proper altitude.</p>
+  ${TBL(['Approach','What it is'],[['ILS','Radio-guided lateral and vertical guidance'],['Visual','You line up by eye'],['IGS','The “Kai Tak” approach to Tokyo Runway 13, with a checkerboard hill and a right turn'],['RNAV / RNP','GPS-based approach, RNP being stricter'],['LDA','Localizer offset from the runway centerline, as at Perth Runway 29']])}
+  <p>“Maintain 220 knots until 4 DME” means hold that speed until about 4 nautical miles from the runway. “Reduce to minimum approach speed” means slow as much as possible without stalling.</p>
+  ${P('American 1234, established ILS 31.')}
+  ${A('American 1234, contact Tokyo Tower on 118.8.')}
+  ${P('Tokyo Tower, American 1234, ILS 31.')}
+  ${NOTE('Do not request landing clearance. Being on approach already says you plan to land.','Rule')}
+  <p>Tower will answer with a landing clearance, “continue approach”, or “expect late landing clearance”.</p>
+  ${A('American 1234, wind 230 degrees 9 knots, Runway 31, cleared to land.')}
+  ${P('Cleared to land Runway 31, American 1234.')}
+  <p>Vacate quickly, at 30 to 40 knots. You have fully vacated only when your <b>tail</b> is past the yellow hold-short line.</p>
+  ${P('Tower, American 1234, fully vacated, B10.')}
+  ${A('American 1234, contact Tokyo Ground on 118.225.')}
+  ${P('Tokyo Ground, American 1234, on B10, request stand 8.')}
+  ${A('American 1234, taxi A10, A, Stand 8.')}
+  <p>Park, shut down and do not ask for permission to shut down. Thank ATC only if the frequency is quiet, then delete your aircraft or keep flying.</p>`}
+],
+quiz:[
+ Q('What does CRAFT stand for?','Clearance, Route, Altitude, Frequency, Transponder','Callsign, Runway, Aircraft, Fuel, Time','Climb, Route, Approach, Flaps, Transponder','Clearance, Runway, Altitude, Fix, Time','The structure of an FAA-style IFR clearance.'),
+ Q('Who gives you the squawk code?','ATC','You choose it','The ATIS','Your airline','It is part of the IFR clearance.'),
+ Q('Which is the recommended order when requesting IFR?','Callsign, aircraft, stand, ATIS, request','Request, callsign, runway','ATIS, squawk, route','Stand, callsign, route, squawk','Keep it short.'),
+ Q('Is “roger” a readback?','No','Yes','Only for taxi','Only for takeoff','You must repeat the instruction.'),
+ Q('Which position does ATC24 give as the departure frequency?','Center','Tower','Ground','Delivery','Departure is folded into Center.'),
+ Q('What should you say when ATC tells you to standby?','Nothing','“Standing by”','“Roger”','Your callsign','Wait silently.'),
+ Q('Which phrase requests pushback?','Request push and start','Request engine start only','Request tug','Request taxi and push','Used with the stand number.'),
+ Q('Who decides the taxi route?','ATC','You','The ground crew','The ATIS','Do not include your own route.'),
+ Q('How should you ask for taxi?','“Ground, American 1234, request taxi”','“Request taxi to 25L via K, A, A5”','“Taxiing now”','“Ready for departure”','Requesting your own route is wrong.'),
+ Q('What is a conditional clearance?','An instruction to follow once a condition is met','A clearance with extra fees','A clearance given in an emergency','A clearance to skip the readback','For example “after the A320 passes…”.'),
+ Q('How do you read back a takeoff clearance?','“Cleared for takeoff 25L, American 1234”','“Wind acknowledged, cleared for takeoff”','“Rolling”','“Takeoff 25L, roger”','Do not read back the wind.'),
+ Q('What is the speed limit below 3,000 ft?','250 knots','300 knots','200 knots','180 knots','Use about 65 to 75% throttle in a jet.'),
+ Q('What do you report on first contact with Center after takeoff?','Callsign and passing altitude for initial altitude','Callsign, heading and speed','Callsign, ATIS and squawk','Only your squawk','Heading and speed are visible on radar.'),
+ Q('Should you request radar contact?','No, it is automatic','Yes, always','Only at night','Only at busy airports','Do not request it.'),
+ Q('What do you say when first contacting the next Center en route?','Callsign and altitude','Callsign, heading, speed','Callsign, ATIS','Callsign and intentions','Nothing else is needed.'),
+ Q('What do you add on first contact with the destination Center?','The ATIS information','Your squawk','Your fuel','Your heading','Arrival ATIS is used on first contact.'),
+ Q('Is “expect the ILS” an approach clearance?','No, only a heads-up','Yes','Only at Tokyo','Only in the evening','You wait for “cleared ILS approach”.'),
+ Q('Should you request landing clearance?','No, it is assumed','Yes, always','Only on final','Only for heavy aircraft','Like asking “can I walk?” while walking.'),
+ Q('When have you fully vacated the runway?','When your tail is past the yellow hold-short line','When your nose is past the line','When you stop at the line','When you reach 20 knots','Holding before the line still counts as on the runway.'),
+ Q('Should you request engine shutdown at the stand?','No, just shut down','Yes','Only at Rockford','Only after thanking ATC','Do not ask.')
+]},
+
+/* ===== 7 ===== */
+{ id:'situations', title:'Situations and scenarios', focus:'Problem solving: mistakes to avoid, what to do when things go wrong.',
+chapters:[
+ {t:'Common beginner mistakes', h:`
+  <h3>Radio technique</h3>
+  <ul>
+   <li>Reporting too much on check-in. ATC sees speed, heading and intentions on radar.</li>
+   <li>Not reading back, or saying “repeat” instead of “say again”.</li>
+   <li>Stating your squawk when it was not asked for.</li>
+   <li>Requesting takeoff or landing. Report your holding point and ready for departure instead.</li>
+   <li>Using filler words, interrupting, or screaming on frequency.</li>
+   <li>Calling again after “standby”, or after being told your place in the queue.</li>
+   <li>Using airport ICAO codes on the radio.</li>
+   <li>Saying “intentions are to land”. ATC can see your flight plan.</li>
+   <li>Not using the NATO alphabet (“Delta”, not “Dee”).</li>
+  </ul>
+  <h3>Runway names</h3>
+  ${TBL(['Runway','Say','Not'],[['25L','Two-five left','Twenty-five Ell / Lima'],['25C','Two-five center','Twenty-five Cee / Charlie'],['25R','Two-five right','Twenty-five Arr / Romeo']])}
+  <h3>Filing and requesting</h3>
+  <ul>
+   <li>Wrong callsign: use ICAO codes (SIA1234, CEB971, QFA4321, RYR39W).</li>
+   <li>Asking for taxi with your own route, or asking for IFR with your own squawk and route.</li>
+   <li>Filing VFR for a flight between islands. Cross-island flights are always IFR.</li>
+   <li>Filing a destination where your aircraft cannot spawn.</li>
+  </ul>
+  <h3>Flying</h3>
+  <ul>
+   <li>Exceeding 250 knots below 3,000 ft.</li>
+   <li>Turning without permission, or pausing mid-air.</li>
+   <li>Stopping on the runway instead of planning a taxiway exit.</li>
+   <li>Not checking the ATIS, not knowing which ATC is online, or showing up unprepared.</li>
+   <li>Picking a busy airport as a beginner.</li>
+   <li>Not using R for altitude hold when you need it.</li>
+  </ul>`},
+ {t:'Possible scenarios', h:`
+  <h3>On the ground</h3>
+  ${DL([['No Ground controller','Move to the next available frequency (Tower or Center).'],['Ground is briefly away','Stay until they return, otherwise treat Ground as CTAF or move on.'],['Long queue','Be patient, or choose another airport.'],['Frequency congested','Wait for a break.'],['Someone steps over you','Stop, and remind them politely.'],['Pushback tug arrives','It is optional. You may accept or deny ground crew.']])}
+  <h3>At Tower</h3>
+  ${DL([['“Expedite”','Be quick, someone may need the runway.'],['Airborne, Tower silent','Past 1,000 ft, remind them to hand you to Center.'],['Landed on IRFD 25C or 25R','Stay with Tower to cross 25L, then switch to Ground. Depends on controller coordination.'],['Cargo at Perth told to vacate the wrong way','Tell Tower you are cargo and need the cargo terminal taxiway.'],['Tower AFK','Treat the frequency as CTAF. If offline, use Center for clearances.']])}
+  <h3>At Center</h3>
+  ${DL([['Too many people talking','Stop your climb at the initial altitude and wait for a gap.'],['Center forgets you','Say your callsign only.'],['Wrong destination','Confirm they know your airport.'],['No handoff','“Request frequency change”.'],['Far into someone’s airspace','Switch on your own.']])}`},
+ {t:'Emergencies', h:`
+  <p>In the ATC24 private server emergencies are random and you cannot trigger one. You can only switch random emergencies on or off. Only <b>engine failure</b> and <b>landing gear failure</b> are allowed. Inventing others, such as fuel or hijack, can get your emergency denied.</p>
+  <h3>Aviate, navigate, communicate</h3>
+  <ol><li><b>Aviate:</b> control the aircraft. With multiple engines use Advanced Mode and rudder.</li><li><b>Navigate:</b> hold heading and altitude, and think about a diversion.</li><li><b>Communicate:</b> tell ATC.</li></ol>
+  <pre>[Callsign], [type of call], [state of emergency], [intentions]</pre>
+  ${P('Center, Singapore 1234, Pan Pan Pan, engine fire, request vectors back to Tokyo.')}
+  <p><b>Mayday</b> (x2) is for immediate danger to life. <b>Pan Pan</b> (x3) is urgent without immediate danger. The guide recommends Pan Pan Pan for both failures in PTFS.</p>
+  <h3>Landing gear failure</h3>
+  <p>The aircraft flies normally, so continue and declare. Stop on the runway and coordinate with emergency services to tow or delete. A front gear failure cannot be towed, and the An-225 cannot be towed at all.</p>`},
+ {t:'Go-around', h:`
+  <p>Either you or ATC can call it. As a pilot, report it quickly.</p>
+  ${P('Tower, Qatari 123, going around.')}
+  ${A('Qatari 123, fly runway heading, climb 2000.')}
+  ${P('Runway heading, 2000, Qatari 123.')}
+  <p>With no instructions, the unwritten procedure is runway heading and climb to 2,000 ft. Tower may ask why. Later you are handed back to Center for resequencing.</p>
+  ${P('Center, Qatari 123, go-around, maintaining 2000 ft.')}`},
+ {t:'Non-professional controllers', h:`
+  <p>Signs: slow, uses fillers, ignores you in quiet traffic, does not know basics, is easily overwhelmed (a decent controller handles 4 to 8 aircraft), is arrogant, gives unreasonable instructions, or lacks manners.</p>
+  <ol><li>Remind them politely.</li><li>Object to an unreasonable instruction and offer a solution, such as longer vectors.</li><li>Plan flights to avoid them, without harassing anyone.</li><li>Give short advice, preferably outside the voice channel.</li><li>Coordinate and cooperate.</li></ol>
+  <p>Do not remind a controller who has told you to “standby”.</p>`}
+],
+quiz:[
+ Q('Which phrase is correct when you did not hear an instruction?','Say again','Repeat','Come again','Resend','Repeat is a military term.'),
+ Q('How do you say runway 25L?','Two-five left','Twenty-five Ell','Twenty-five Lima','Two-five Lima','Same for center and right.'),
+ Q('How do you refer to IRFD_TWR on the radio?','Rockford Tower','I-R-F-D Tower','Control Tower One','Rockford Radar','Use airport names.'),
+ Q('When do you say your squawk?','Only in the IFR clearance readback','On every call','When checking in on the runway','Never','The squawk is only relevant in clearances.'),
+ Q('May you file VFR for a flight between islands?','No, those flights are IFR','Yes','Only for light aircraft','Only at night','VFR is for staying on the same island.'),
+ Q('What is the rule for choosing an aircraft for a destination?','If you can spawn it there, you can fly there','Any aircraft can go anywhere','Only jets can go to big airports','Only helicopters can go to small airports','An A220 cannot go to St. Barthelemy.'),
+ Q('What does it mean when Tower says “expedite”?','Be quick, someone may need the runway','Slow down','Stop on the runway','Go around','Hurry off or onto the runway.'),
+ Q('What is the unwritten go-around procedure?','Fly runway heading and climb to 2,000 ft','Turn left and descend','Hold position','Climb to FL100','If no instruction was given.'),
+ Q('Which emergencies are allowed in ATC24?','Engine failure and landing gear failure','Fuel and hijack','Cabin pressure and radio failure','Any emergency you pick','Others can be denied.'),
+ Q('Which call is used for immediate danger to life?','Mayday','Pan Pan','Standby','Say again','Pan Pan is urgent but not immediate.'),
+ Q('What is the correct priority in an emergency?','Aviate, navigate, communicate','Communicate, navigate, aviate','Navigate, aviate, communicate','Delete, respawn, report','Fly the aircraft first.'),
+ Q('What is the format for declaring an emergency?','Callsign, type of call, state of emergency, intentions','Type of call, intentions, callsign','Callsign, squawk, route','State, callsign, ATIS','For example “Pan Pan Pan, engine fire…”.'),
+ Q('Which aircraft cannot be towed after a failure?','An-225, or any with a front gear failure','Any narrow-body','Any helicopter','Every Boeing','Plan with emergency services.'),
+ Q('Center has forgotten you. What do you say?','Your callsign only','“Hello?” repeatedly','Your squawk','Your intentions','Controllers will answer when they can.'),
+ Q('Center forgets to hand you off. What do you say?','Request frequency change','Say again slower','Wilco','Disregard','The magic phrase.'),
+ Q('Too many people are talking on the Center frequency. What do you do?','Stop climbing at the initial altitude and wait for a break','Keep climbing to FL100','Leave the frequency','Transmit over them','Then announce yourself.'),
+ Q('You are airborne past 1,000 ft and Tower has said nothing. What do you do?','Remind Tower to hand you off to Center','Switch frequencies silently','Land again','Declare an emergency','Remind politely.'),
+ Q('There is no Ground controller. What do you do?','Move to the next available frequency (Tower or Center)','Wait indefinitely','Taxi without clearance','Switch airports','Top-down service applies.'),
+ Q('How many aircraft can a decent controller handle?','About 4 to 8','1 or 2','Exactly 3','Over 50','Being easily overwhelmed is a warning sign.'),
+ Q('What is a good response to an unreasonable controller instruction?','Object politely and propose a solution','Insult them','Ignore it silently','Leave the server','For example, ask for longer vectors.')
+]}
+];
+
+/* ---------- storage (optional, per browser) ---------- */
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem('atc24-scores')||'{}'); }catch(e){ return {}; } },
+  set(o){ try{ localStorage.setItem('atc24-scores',JSON.stringify(o)); }catch(e){} }
+};
+let scores = store.get();
+let mem = {}; /* fallback if storage is unavailable */
+const getBest = id => (scores[id]!=null?scores[id]:mem[id]);
+const setBest = (id,v) => { const b=getBest(id); if(b==null||v>b){ scores[id]=v; mem[id]=v; store.set(scores);} };
+
+/* ---------- rendering ---------- */
+const $ = s => document.querySelector(s);
+const main = $('#main'), nav = $('#nav'), rail = $('#rail');
+const pad = n => String(n).padStart(2,'0');
+
+function renderNav(active){
+  nav.innerHTML = LESSONS.map((l,i)=>{
+    const b = getBest(l.id);
+    return `<button data-id="${l.id}" ${active===l.id?'aria-current="page"':''}><span class="n">${pad(i+1)}</span><span class="t">${l.title}</span><span class="s ${b!=null&&b>=16?'done':''}">${b!=null?b+'/20':''}</span></button>`;
+  }).join('');
+}
+
+function homeView(){
+  const done = LESSONS.filter(l=>getBest(l.id)!=null).length;
+  main.innerHTML = `<div class="col hero">
+   <p class="eyebrow">ATC24 · 7 lessons · 140 questions</p>
+   <h1>Basic IFR, one lesson at a time.</h1>
+   <p class="lede">Learn how to fly an IFR flight on ATC24: from your first ATIS to vacating the runway. Each lesson follows a section of the ATC24 Basic IFR Guide and ends with a 20-question quiz.</p>
+   <svg viewBox="0 0 720 120" role="img" aria-label="A flight path climbing from a runway to cruise, then descending to land">
+     <line x1="0" y1="100" x2="720" y2="100" stroke="currentColor" stroke-opacity=".25"/>
+     <line x1="0" y1="40" x2="720" y2="40" stroke="currentColor" stroke-opacity=".12" stroke-dasharray="3 5"/>
+     <path d="M40 100 L150 100 C 210 100 230 40 300 40 L440 40 C 510 40 540 100 600 100 L690 100" fill="none" stroke="var(--accent)" stroke-width="2"/>
+     <circle cx="150" cy="100" r="3.5" fill="var(--accent)"/><circle cx="300" cy="40" r="3.5" fill="var(--accent)"/><circle cx="440" cy="40" r="3.5" fill="var(--accent)"/><circle cx="600" cy="100" r="3.5" fill="var(--accent)"/>
+     <g font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor" fill-opacity=".6">
+       <text x="40" y="116">RWY 25L</text><text x="272" y="30">FL40</text><text x="440" y="30">FL30</text><text x="560" y="116">RWY 31</text><text x="2" y="44">TL</text>
+     </g>
+   </svg>
+   <div class="tbl">${LESSONS.map((l,i)=>{const b=getBest(l.id);return `<button data-id="${l.id}"><span class="n">${pad(i+1)}</span><span class="t">${l.title}<small>${l.focus}</small></span><span class="s ${b!=null&&b>=16?'done':''}">${b!=null?'Best '+b+'/20':'Not taken'}</span></button>`}).join('')}</div>
+   <p class="fine">${done} of 7 quizzes taken. Based on the “ATC24 Basic IFR Guide” v1.1 by Landguy18 (cheesesteakpotato51). This course is an unofficial study aid, so check the official ATC24 Discord for anything that may have changed. Sections 8 and 9 of the guide (tools and extra guides) are optional and are not part of the course. Scores are kept in this browser only.</p>
+  </div>`;
+  renderNav(null);
+  document.title='Basic IFR Course';
+  window.scrollTo(0,0);
+}
+
+let quizState = null;
+
+function lessonView(id){
+  const idx = LESSONS.findIndex(l=>l.id===id);
+  if(idx<0){ return homeView(); }
+  const L = LESSONS[idx];
+  main.innerHTML = `<div class="col">
+    <p class="eyebrow">Lesson ${pad(idx+1)} · ${L.chapters.length} chapters</p>
+    <h1>${L.title}</h1>
+    <p class="lede">${L.focus}</p>
+    ${L.chapters.map((c,i)=>`<section class="chap"><h2><span class="cn">${pad(i+1)}</span>${c.t}</h2>${c.h}</section>`).join('')}
+    <section class="quiz" id="quiz"></section>
+    <div class="row" style="margin-top:40px">${idx>0?`<button class="btn ghost" data-id="${LESSONS[idx-1].id}">← ${LESSONS[idx-1].title}</button>`:''}${idx<LESSONS.length-1?`<button class="btn ghost" data-id="${LESSONS[idx+1].id}">${LESSONS[idx+1].title} →</button>`:''}</div>
+  </div>`;
+  renderNav(id);
+  document.title = L.title + ' · Basic IFR Course';
+  quizState = {id, idx, phase:'intro'};
+  renderQuiz();
+  window.scrollTo(0,0);
+}
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function renderQuiz(){
+  const L = LESSONS[quizState.idx], box = $('#quiz'), s = quizState;
+  const best = getBest(L.id);
+  if(s.phase==='intro'){
+    box.innerHTML = `<p class="eyebrow">Lesson ${pad(s.idx+1)} quiz</p><h2 style="font-size:28px;font-weight:300;margin-bottom:8px">Check what you learned</h2>
+      <p style="color:var(--mute);margin:0 0 20px">20 multiple-choice questions on ${L.title.toLowerCase()}. Answers show instantly, with a short reason.${best!=null?` Your best score is <b>${best}/20</b>.`:''}</p>
+      <button class="btn" id="start">Start quiz</button>`;
+    $('#start').onclick = ()=>{ s.order = shuffle(L.quiz.map((_,i)=>i)); s.i=0; s.res=[]; s.picked=null; s.phase='ask'; renderQuiz(); box.scrollIntoView({block:'start'}); };
+    return;
+  }
+  if(s.phase==='done'){
+    const n = s.res.filter(r=>r.ok).length;
+    setBest(L.id,n); renderNav(L.id);
+    const misses = s.res.filter(r=>!r.ok);
+    box.innerHTML = `<p class="eyebrow">Lesson ${pad(s.idx+1)} result</p>
+      <div class="score">${n}<span> / 20</span></div>
+      <p style="color:var(--mute);margin:0">${n>=18?'Excellent. You are ready for the next lesson.':n>=14?'Solid. Review the missed questions below.':'Reread the lesson, then try again.'}</p>
+      ${misses.length?`<h3 style="margin-top:28px">Missed</h3><ul class="miss">${misses.map(m=>`<li>${m.q}<em>Answer: ${m.a}${m.e?' · '+m.e:''}</em></li>`).join('')}</ul>`:''}
+      <div class="row"><button class="btn" id="again">Try again</button>${s.idx<LESSONS.length-1?`<button class="btn ghost" data-id="${LESSONS[s.idx+1].id}">Next lesson →</button>`:`<button class="btn ghost" id="gohome">All lessons</button>`}</div>`;
+    $('#again').onclick = ()=>{ s.phase='intro'; renderQuiz(); };
+    const gh=$('#gohome'); if(gh) gh.onclick=()=>go('');
+    return;
+  }
+  /* ask */
+  const q = L.quiz[s.order[s.i]];
+  if(!s.opts){ s.opts = shuffle(q.o.map((t,k)=>({t,ok:k===0}))); }
+  const ticks = Array.from({length:20},(_,k)=>`<i class="${k<s.res.length?(s.res[k].ok?'ok':'no'):(k===s.i?'cur':'')}"></i>`).join('');
+  const answered = s.picked!=null;
+  box.innerHTML = `<div class="qcard">
+    <div class="ticks" aria-hidden="true">${ticks}</div>
+    <div class="qmeta"><span>Question ${s.i+1} of 20</span><span>${s.res.filter(r=>r.ok).length} correct</span></div>
+    <p class="qtext" id="qt">${q.q}</p>
+    <div class="opts" role="group" aria-labelledby="qt">${s.opts.map((o,k)=>`<button class="opt ${answered?(o.ok?'right':(k===s.picked?'wrong':'')):''}" data-k="${k}" ${answered?'disabled':''}><span class="k">${'ABCD'[k]}</span><span>${o.t}</span></button>`).join('')}</div>
+    ${answered?`<p class="exp"><b>${s.opts[s.picked].ok?'Correct.':'Not quite.'}</b> ${q.e||''}</p><div class="row"><button class="btn" id="next">${s.i===19?'See result':'Next question'}</button></div>`:''}
+  </div>`;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k; s.picked=k;
+    s.res.push({ok:s.opts[k].ok,q:q.q,a:q.o[0],e:q.e});
+    renderQuiz();
+  });
+  const nx=$('#next'); if(nx){ nx.focus(); nx.onclick=()=>{ s.picked=null; s.opts=null; if(s.i===19){s.phase='done';} else {s.i++;} renderQuiz(); $('#quiz').scrollIntoView({block:'start'}); }; }
+}
+
+/* ---------- routing ---------- */
+function go(id){ if(location.hash.slice(1)===id){ route(); } else { location.hash = id; } }
+function route(){
+  const id = location.hash.slice(1);
+  rail.classList.remove('open'); $('#menu').setAttribute('aria-expanded','false');
+  if(!id) homeView(); else lessonView(id);
+}
+document.addEventListener('click',e=>{
+  const b = e.target.closest('[data-id]');
+  if(b && !b.classList.contains('opt')){ go(b.dataset.id); }
+});
+$('#home').onclick = ()=>go('');
+$('#menu').onclick = ()=>{ const o=rail.classList.toggle('open'); $('#menu').setAttribute('aria-expanded',o); };
+window.addEventListener('hashchange',route);
+document.addEventListener('keydown',e=>{
+  if(!quizState||!$('#quiz')||quizState.phase!=='ask'||quizState.picked!=null) return;
+  const k='1234'.indexOf(e.key); if(k>-1){ const b=document.querySelectorAll('.opt')[k]; if(b) b.click(); }
+});
+route();
+</script>
+</body>
+</html>
